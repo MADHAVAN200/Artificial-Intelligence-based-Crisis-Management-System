@@ -1,2 +1,2 @@
-# DisasterIQ
-DisasterIQ is an integrated disaster response dashboard that combines satellite imagery, social media feeds, and official alerts into a single platform.
+# Artificial Intelligence based Crisis Management System
+The AICMS project is an advanced AI-driven system for early warning and disaster response. It fuses satellite, sensor, and social media data using CNN, LSTM, and NLP techniques for spatial-temporal analysis. Reinforcement learning agents optimize local and district-level predictions, resource allocation, and evacuation strategies. The system delivers real-time, localized alerts through multi-channel platforms, ensuring access even in remote areas. Community feedback is integrated to continually refine predictions and alerts. Overall, AICMS empowers authorities and communities with timely, explainable, and actionable disaster warnings, enhancing preparedness and minimizing harm.
