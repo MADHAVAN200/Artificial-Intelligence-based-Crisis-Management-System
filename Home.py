@@ -1205,20 +1205,20 @@ with tab2:
             st.write("**Detected Damage Types:**")
             col1, col2 = st.columns(2)
             with col1:
-                st.info("🌊 Flooded Areas: Detected in multiple regions")
-                st.info("🛣️ Flooded Roads: Major transportation routes affected")
+                st.info("Flooded Areas: Detected in multiple regions")
+                st.info("Flooded Roads: Major transportation routes affected")
             with col2:
-                st.info("🏠 Water-Damaged Buildings: Potential structural issues")
-                st.info("🌉 Compromised Infrastructure: Bridges and utilities affected")
+                st.info("Water-Damaged Buildings: Potential structural issues")
+                st.info("Compromised Infrastructure: Bridges and utilities affected")
         else:  # Earthquake
             st.write("**Detected Damage Types:**")
             col1, col2 = st.columns(2)
             with col1:
-                st.info("🏚️ Collapsed Buildings: Multiple structures affected")
-                st.info("🛣️ Road Damage: Access routes compromised")
+                st.info("Collapsed Buildings: Multiple structures affected")
+                st.info("Road Damage: Access routes compromised")
             with col2:
-                st.info("🔥 Fire Outbreaks: Secondary damage from ruptured gas lines")
-                st.info("🌉 Bridge Failures: Critical infrastructure damage")
+                st.info("Fire Outbreaks: Secondary damage from ruptured gas lines")
+                st.info("Bridge Failures: Critical infrastructure damage")
     else:
         if satellite_source == "Upload Custom":
             st.info("Please upload a satellite image and enable damage detection to see AI analysis")
@@ -1692,11 +1692,11 @@ with st.expander("AI Decision Explanations", expanded=True):
             
             # Add specific recommendations based on the scenario
             if scenario == "Simulated Flood" and idx == 1:
-                st.info("🚨 **Critical Recommendation:** Deploy water rescue teams and boats immediately. Establish temporary shelters on higher ground.")
+                st.info("**Critical Recommendation:** Deploy water rescue teams and boats immediately. Establish temporary shelters on higher ground.")
             elif scenario == "Simulated Earthquake" and idx == 1:
-                st.info("🚨 **Critical Recommendation:** Deploy search and rescue teams with specialized equipment. Set up field medical stations.")
+                st.info("**Critical Recommendation:** Deploy search and rescue teams with specialized equipment. Set up field medical stations.")
             
             if idx <= 2:
-                st.success("✅ **Resources Allocated:** Emergency response teams, medical supplies, and food/water dispatched.")
+                st.success("**Resources Allocated:** Emergency response teams, medical supplies, and food/water dispatched.")
     else:
         st.info("Click 'Run Complete Analysis' in the sidebar to see detailed zone-by-zone analysis.")
