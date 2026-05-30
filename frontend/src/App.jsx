@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import Sidebar from './components/Sidebar';
+import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
+import { Sun, Moon } from 'lucide-react';
 
 import { api } from './services/api';
 
@@ -8,12 +8,28 @@ function App() {
   const [scenario, setScenario] = useState("Simulated Flood");
   const [satelliteSource, setSatelliteSource] = useState("Sentinel-2");
   const [imageryDate, setImageryDate] = useState(new Date().toISOString().split('T')[0]);
-  const [locationInput, setLocationInput] = useState("26.85, 80.95");
+  const [locationInput, setLocationInput] = useState("19.0760, 72.8777");
   const [analysisOptions, setAnalysisOptions] = useState({
     damage: true,
     social: true
   });
   const [activeTab, setActiveTab] = useState("map");
+
+  // Theme State
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('darkMode', 'false');
+    }
+  }, [darkMode]);
 
   // Data State
   const [satelliteImage, setSatelliteImage] = useState(null);
@@ -21,6 +37,7 @@ function App() {
   const [damageOverlay, setDamageOverlay] = useState(null);
   const [damageStats, setDamageStats] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [runCompleteAnalysis, setRunCompleteAnalysis] = useState(false);
 
   const handleFetchImagery = async () => {
     try {
@@ -37,6 +54,19 @@ function App() {
     }
   };
 
+  const handleUploadImagery = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const { data } = await api.uploadSatelliteImage(formData);
+      setSatelliteImage(data.image);
+      setOverlayBounds(data.bounds);
+    } catch (error) {
+      console.error("Error uploading imagery", error);
+      alert("Failed to upload satellite imagery");
+    }
+  };
+
   const handleRunAnalysis = async () => {
     if (!satelliteImage) {
       alert("Please fetch satellite imagery first!");
@@ -44,6 +74,7 @@ function App() {
     }
 
     setIsAnalyzing(true);
+    setRunCompleteAnalysis(true);
     try {
       if (analysisOptions.damage) {
         const { data } = await api.detectDamage({
@@ -54,7 +85,6 @@ function App() {
         setDamageStats({ percentage: data.percentage, details: data.details });
         setActiveTab('damage'); // Switch to damage tab
       }
-      // Add other analysis logic here
     } catch (error) {
       console.error("Error running analysis", error);
     } finally {
@@ -62,39 +92,32 @@ function App() {
     }
   };
 
-  // Override Sidebar's fetch button logic. 
-  // We need to pass handleFetchImagery to logic inside Sidebar or create a new prop there.
-  // Sidebar currently calls 'onRunAnalysis' for the big button.
-  // The fetch button inside Sidebar is just a button. We need to hook it up.
-
-
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans text-slate-900">
-      <Sidebar
-        scenario={scenario} setScenario={setScenario}
-        satelliteSource={satelliteSource} setSatelliteSource={setSatelliteSource}
-        imageryDate={imageryDate} setImageryDate={setImageryDate}
-        locationInput={locationInput} setLocationInput={setLocationInput}
-        analysisOptions={analysisOptions} setAnalysisOptions={setAnalysisOptions}
-        onRunAnalysis={handleRunAnalysis}
-        onFetchImagery={handleFetchImagery}
-      />
-
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <div className="absolute inset-0 bg-grid-slate-200/50 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] pointer-events-none" />
+    <div className="flex h-screen bg-slate-55 dark:bg-black overflow-hidden font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <main className="flex-1 flex flex-col h-screen overflow-hidden relative bg-slate-55 dark:bg-black">
+        <div className="absolute inset-0 bg-grid-slate-200/50 dark:bg-grid-slate-800/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] pointer-events-none" />
 
         <div className="flex-1 overflow-y-auto z-10">
-          <header className="px-8 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-20">
+          <header className="px-8 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-black/80 backdrop-blur-sm sticky top-0 z-20 transition-colors">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-slate-800">Mission Control</h2>
-                <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  System Operational • {scenario}
+                <h1 className="text-lg font-extrabold bg-gradient-to-r from-blue-800 via-indigo-900 to-slate-900 dark:from-blue-400 dark:via-cyan-300 dark:to-blue-400 bg-clip-text text-transparent tracking-tight">
+                  Artificial-Intelligence-based-Crisis-Management-System
+                </h1>
+                <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 flex items-center gap-1.5 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  System Operational
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="px-3 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-full border border-red-100 flex items-center gap-1">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-650 dark:text-slate-350 border border-slate-205 dark:border-slate-700 transition-colors"
+                  title={darkMode ? "Switch to Light Mode" : "Switch to Dark/Black Mode"}
+                >
+                  {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+                </button>
+                <div className="px-2.5 py-0.5 bg-red-50 dark:bg-red-950/40 text-red-650 dark:text-red-400 text-[10px] font-bold rounded-full border border-red-100 dark:border-red-900/40 flex items-center gap-1">
                   LIVE INCIDENT
                 </div>
               </div>
@@ -112,6 +135,16 @@ function App() {
               damageStats={damageStats}
               onRunDetection={handleRunAnalysis}
               isAnalyzing={isAnalyzing}
+              runCompleteAnalysis={runCompleteAnalysis}
+              darkMode={darkMode}
+              satelliteSource={satelliteSource}
+              setSatelliteSource={setSatelliteSource}
+              imageryDate={imageryDate}
+              setImageryDate={setImageryDate}
+              locationInput={locationInput}
+              setLocationInput={setLocationInput}
+              onFetchImagery={handleFetchImagery}
+              onUploadImagery={handleUploadImagery}
             />
           </div>
         </div>
